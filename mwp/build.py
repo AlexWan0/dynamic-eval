@@ -11,10 +11,8 @@ class ProblemBuilder:
     def __init__(
             self,
             problem_name: str,
-            # parser_name: str
         ):
         self.op_map, self.problem = PROBLEMS[problem_name]()
-        # self.parser = PARSERS[parser_name]()
         self.grammar = self.problem['grammar']
         self.sampler = ValuesSampler(self.problem['val_range'])
 
