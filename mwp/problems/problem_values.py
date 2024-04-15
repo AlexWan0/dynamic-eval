@@ -37,16 +37,27 @@ jobs = {
                 'arg0': '${}',
                 'arg1': '${}'
             }
+        },
+        '/': {
+            'templates': {
+                'id_utt': 'the amount of money in the {color} piggy bank',
+                'utt': 'The group split {arg0} among {arg1} piggy banks. One of these piggy banks is {color}.'
+            },
+            'units':{
+                'arg0': '${}',
+                'arg1': '{}'
+            }
         }
     },
     'question': 'What is the value of {query}?',
     'grammar': """
         S -> E
-        E -> '(' ADD ')' | '(' SUB ')' | '(' MUL ')'
+        E -> '(' ADD ')' | '(' SUB ')' | '(' MUL ')' | '(' DIV ')'
         ADD -> E '+' E
         SUB -> E '-' N
         MUL -> N '*' N
+        DIV -> E '/' N
         N -> '{x}'
     """,
-    'val_range': (1, 100),
+    'val_range': (10, 1000),
 }

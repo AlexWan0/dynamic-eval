@@ -36,7 +36,12 @@ class ValuesSampler():
         self.mem_backtrack = MemDict()
     
     def node_constraints(self, n):
-        return self.val_range[0] <= n < self.val_range[1]
+        '''
+        Check that n is in the specified range, and that it is an integer.
+        '''
+        in_range = self.val_range[0] <= n < self.val_range[1]
+        is_integer = True if isinstance(n, int) else (n.is_integer() if isinstance(n, float) else False)
+        return in_range and is_integer
 
     @add_mem
     def populate(self, tree, depth=0):
@@ -65,18 +70,22 @@ class ValuesSampler():
             for r in right_possible:
                 calc = op(l, r)
                 if self.node_constraints(calc):
-                    possible.add(calc)
+                    possible.add(int(calc))
 
                     if calc not in tree_calcs:
                         tree_calcs[calc] = []
 
                     self.mem_backtrack[tree_hash][calc].append((l, r))
 
+        assert len(possible) < (self.val_range[1] - self.val_range[0])
+
         return possible
     
     def pick_values(self, tree, target_val=None, depth=0):
         if target_val is None:
-            target_val = random.choice(list(self.mem[hash_tree(tree)]))
+            valid_vals = list(self.mem[hash_tree(tree)])
+            assert len(valid_vals) > 0
+            target_val = random.choice(valid_vals)
 
         if tree.label() == 'S':
             return self.pick_values(tree[0], target_val=target_val, depth=depth + 1)
@@ -92,7 +101,10 @@ class ValuesSampler():
         left_tree, right_tree = tree[0], tree[2]
         tree_hash = hash_tree(tree)
         tree_calcs = self.mem_backtrack[tree_hash]
-        chosen_path = random.choice(tree_calcs[target_val])
+
+        valid_vals = tree_calcs[target_val]
+        assert len(valid_vals) > 0
+        chosen_path = random.choice(valid_vals)
 
         left_val, left_str, left_target = self.pick_values(
             left_tree,
@@ -106,23 +118,24 @@ class ValuesSampler():
             depth=depth + 1
         )
         
-        assert op(left_target, right_target) == target_val
+        assert int(op(left_target, right_target)) == target_val
 
         return [tree[1], [left_val, right_val]], f"({left_str} {tree[1]} {right_str})", target_val
     
     def pick_values_dset(self, trees, n_samples=25, pbar=True):
+        iterator_mem = tqdm(trees, desc='Populating mem values:') if pbar else trees
         # populat mem
-        for tree_lst in trees:
+        for tree_lst in iterator_mem:
             assert len(tree_lst) == 1
             tree = tree_lst[0]
 
             self.populate(tree)
-        
-        iterator = tqdm(trees, desc='Sampling values:') if pbar else trees
 
         # sample values from mem
+        iterator_sample = tqdm(trees, desc='Sampling values:') if pbar else trees
+        
         results_vals = []
-        for tree_lst in iterator:
+        for tree_lst in iterator_sample:
             assert len(tree_lst) == 1
             tree = tree_lst[0]
 
