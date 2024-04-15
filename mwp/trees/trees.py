@@ -79,6 +79,8 @@ class ValuesSampler():
 
         assert len(possible) < (self.val_range[1] - self.val_range[0])
 
+        assert len(possible) > 0
+
         return possible
     
     def pick_values(self, tree, target_val=None, depth=0):
@@ -133,7 +135,7 @@ class ValuesSampler():
 
         # sample values from mem
         iterator_sample = tqdm(trees, desc='Sampling values:') if pbar else trees
-        
+
         results_vals = []
         for tree_lst in iterator_sample:
             assert len(tree_lst) == 1

@@ -59,5 +59,5 @@ jobs = {
         DIV -> E '/' N
         N -> '{x}'
     """,
-    'val_range': (10, 1000),
+    'val_range': (2, 100),
 }
