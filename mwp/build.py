@@ -1,12 +1,10 @@
-# import numexpr
-from mwp.problems.base import Constant, Operation
-# from mwp.trees_old.parsers import PARSERS
-from mwp.problems.problems import PROBLEMS
-from mwp.trees import grammar_to_trees, ValuesSampler
-
 import pandas as pd
 from tqdm.auto import tqdm
 tqdm.pandas()
+
+from mwp.problems.base import Constant, Operation
+from mwp.problems.problems import PROBLEMS
+from mwp.trees import grammar_to_trees, ValuesSampler
 
 
 class ProblemBuilder:
@@ -98,20 +96,6 @@ class ProblemBuilder:
 
         return df
 
-    # def problem_from_exp(self, expression):
-    #     solution = numexpr.evaluate(expression)
-
-    #     parsed = self.parser.parse(expression)
-    #     root, node_list = self.build_from_tree(parsed, {})
-
-    #     problem_text = ' '.join([
-    #         node.get_utt() for node in node_list
-    #         if isinstance(node, Operation)
-    #     ])
-    #     target_value = root.get_value()
-    #     target_question = self.problem['question'].format(query=target_value)
-
-    #     return problem_text, target_question, solution
 
 if __name__ == '__main__':
     problem = ProblemBuilder('jobs')
