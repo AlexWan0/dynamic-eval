@@ -61,3 +61,49 @@ jobs = {
     """,
     'val_range': (2, 100),
 }
+
+jobs_nodiv = {
+    'constants': _constants,
+    'operations': {
+        '*': {
+            'templates': {
+                'id_utt': 'the amount {name} made working as a {job}',
+                'utt': 'Being a {job} pays {arg0} an hour. {name} worked {arg1} as a {job}.'
+            },
+            'units':{
+                'arg0': '${}',
+                'arg1': '{} hours'
+            }
+        },
+        '+': {
+            'templates': {
+                'id_utt': 'the amount of money in the {color} piggy bank',
+                'utt': 'The group pooled {arg0} and {arg1} and put it in a {color} piggy bank.'
+            },
+            'units':{
+                'arg0': '${}',
+                'arg1': '${}'
+            }
+        },
+        '-': {
+            'templates': {
+                'id_utt': 'the amount of money left after buying a {item}',
+                'utt': 'A {item} costs {arg1}. The group bought a {item} using {arg0}.'
+            },
+            'units':{
+                'arg0': '${}',
+                'arg1': '${}'
+            }
+        }
+    },
+    'question': 'What is the value of {query}?',
+    'grammar': """
+        S -> E
+        E -> '(' ADD ')' | '(' SUB ')' | '(' MUL ')'
+        ADD -> E '+' E
+        SUB -> E '-' N
+        MUL -> N '*' N
+        N -> '{x}'
+    """,
+    'val_range': (10, 1000),
+}

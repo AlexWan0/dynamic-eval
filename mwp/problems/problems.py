@@ -1,4 +1,4 @@
-from .problem_values import jobs
+from .problem_values import *
 from mwp.problems.base import BinaryOperation
 
 
@@ -28,4 +28,5 @@ def init_binops(problem):
 
 PROBLEMS = {
     'jobs': lambda: (init_binops(jobs), jobs),
+    'jobs_nodiv': lambda: (init_binops(jobs_nodiv), jobs_nodiv),
 }
