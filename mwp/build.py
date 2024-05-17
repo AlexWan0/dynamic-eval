@@ -1,4 +1,5 @@
 import pandas as pd
+import argparse
 from tqdm.auto import tqdm
 tqdm.pandas()
 
@@ -16,8 +17,8 @@ class ProblemBuilder:
         self.grammar = self.problem['grammar']
         self.sampler = ValuesSampler(self.problem['val_range'])
 
-    def get_trees(self, max_depth) -> tuple:
-        return grammar_to_trees(self.grammar, max_depth)
+    def get_trees(self, max_depth, min_depth=0) -> tuple:
+        return grammar_to_trees(self.grammar, max_depth, min_depth=min_depth)
 
     def get_tree_values(self, trees, n_samples) -> list[tuple]:
         return self.sampler.pick_values_dset(trees, n_samples)
@@ -55,8 +56,10 @@ class ProblemBuilder:
 
         return problem_text, target_question
 
-    def build_dataset(self, max_depth, n_samples) -> pd.DataFrame:
-        exprs, trees = self.get_trees(max_depth)
+    def build_dataset(self, max_depth, n_samples, min_depth=0) -> pd.DataFrame:
+        print('generating trees')
+        exprs, trees = self.get_trees(max_depth, min_depth=min_depth)
+        
         print('num trees:', len(trees))
 
         # num_trees sized list[tuple(tree_vals, tree_strs, target_vals)]
@@ -96,6 +99,21 @@ class ProblemBuilder:
 
 
 if __name__ == '__main__':
-    problem = ProblemBuilder('jobs')
-    df = problem.build_dataset(10, 5)
+    args = argparse.ArgumentParser()
+
+    args.add_argument('out_path', type=str)
+
+    args.add_argument('--problem', type=str, default='jobs')
+    args.add_argument('--max_depth', type=int, default=12)
+    args.add_argument('--min_depth', type=int, default=0)
+    args.add_argument('--n_samples', type=int, default=100)
+
+    args = args.parse_args()
+
+    problem = ProblemBuilder(args.problem)
+    df = problem.build_dataset(args.max_depth, args.n_samples, min_depth=args.min_depth)
     print(df.head())
+
+    print(f'sampled {len(df)} problems')
+
+    df.to_pickle(args.out_path)

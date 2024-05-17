@@ -1,6 +1,7 @@
 import nltk
 from nltk import CFG
 from nltk.parse.generate import generate
+from nltk.tree import Tree
 import random
 from tqdm.auto import tqdm
 
@@ -14,15 +15,27 @@ op_map = {
     '/': (lambda x, y: x / y),
 }
 
-def grammar_to_trees(grammar, depth) -> tuple:
+
+def get_max_depth(tree):
+    if isinstance(tree, Tree):
+        return 1 + max(get_max_depth(child) for child in tree)
+    else:
+        return 0
+
+def grammar_to_trees(grammar, max_depth, min_depth=0) -> tuple:
     grammar = CFG.fromstring(grammar)
     parser = nltk.ChartParser(grammar)
 
     results = []
 
-    for expr in generate(grammar, depth=depth):
+    for expr in generate(grammar, depth=max_depth):
         tree = parser.parse(expr)
         results.append((expr, list(tree)))
+
+        tree_depth = get_max_depth(tree)
+
+        if tree_depth < min_depth:
+            continue
 
     exprs, trees = zip(*results)
 
@@ -125,7 +138,7 @@ class ValuesSampler():
         return [tree[1], [left_val, right_val]], f"({left_str} {tree[1]} {right_str})", target_val
     
     def pick_values_dset(self, trees, n_samples=25, pbar=True):
-        iterator_mem = tqdm(trees, desc='Populating mem values:') if pbar else trees
+        iterator_mem = tqdm(trees, desc='Populating mem values') if pbar else trees
         # populat mem
         for tree_lst in iterator_mem:
             assert len(tree_lst) == 1
@@ -134,7 +147,7 @@ class ValuesSampler():
             self.populate(tree)
 
         # sample values from mem
-        iterator_sample = tqdm(trees, desc='Sampling values:') if pbar else trees
+        iterator_sample = tqdm(trees, desc='Sampling values') if pbar else trees
 
         results_vals = []
         for tree_lst in iterator_sample:
