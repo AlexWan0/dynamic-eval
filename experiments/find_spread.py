@@ -61,10 +61,10 @@ def find_extrema(maximize: bool, save_file: str = None) -> tuple[list[int], dict
     return ranked_arms, arm_vals, opt.get_logs()
 
 print('finding minima')
-worst_arms, est_success_w, logs_w = find_extrema(maximize=False, save_file='minima.pkl')
+worst_arms, est_success_w, logs_w = find_extrema(maximize=False, save_file='minima')
 
 print('finding maxima')
-best_arms, est_success_b, logs_b = find_extrema(maximize=True, save_file='maxima.pkl')
+best_arms, est_success_b, logs_b = find_extrema(maximize=True, save_file='maxima')
 
 print('saving results')
 with open(args.output_path, 'wb') as f:
@@ -74,5 +74,6 @@ with open(args.output_path, 'wb') as f:
         'best_arms': best_arms,
         'est_success_b': est_success_b,
         'logs_w': logs_w,
-        'logs_b': logs_b
+        'logs_b': logs_b,
+        'args': args
     }, f)
