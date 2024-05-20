@@ -97,6 +97,7 @@ class ProblemBuilder:
             row['question'] = question
             return row
         
+        print('rendering problems from trees')
         df = df.progress_apply(_add_problem_text, axis=1)
 
         print('dataframe:', df.columns)
