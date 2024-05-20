@@ -44,8 +44,8 @@ class Node:
 
         return [
             self.ops[0],
-            self.children[0].get_binary_tree_as_list(),
-            self.children[1].get_binary_tree_as_list()
+            [self.children[0].get_binary_tree_as_list(),
+            self.children[1].get_binary_tree_as_list()]
         ]        
 
     def binarize(self):
@@ -150,4 +150,4 @@ def load_and_parse(split='train'):
     df_binary = df[df['tree'].apply(lambda x: x is not None and x.is_binary())].copy()
     df_binary['tree_vals'] = df_binary['tree'].apply(lambda x: x.get_binary_tree_as_list())
 
-    return df_binary
+    return df_binary.reset_index(drop=True)
