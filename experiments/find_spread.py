@@ -12,10 +12,13 @@ args = argparse.ArgumentParser()
 
 args.add_argument('output_path', type=str)
 
-# define space of problems
+# specify trees
 args.add_argument('--problem', type=str, default='jobs')
 args.add_argument('--max_depth', type=int, default=12)
 args.add_argument('--min_depth', type=int, default=0)
+args.add_argument('--subsample_trees', type=int, default=None)
+
+# specify samples from trees
 args.add_argument('--n_samples', type=int, default=100)
 args.add_argument('--problem_save', type=str, default='data/samples_10.pkl')
 
@@ -33,9 +36,13 @@ if os.path.exists(args.problem_save):
 else:
     print('generating problems')
     problem = ProblemBuilder("jobs")
-    df = problem.build_dataset(args.max_depth, args.n_samples, min_depth=args.min_depth)
-    print(df.head())
-
+    df = problem.build_dataset(
+        args.max_depth,
+        args.n_samples,
+        min_depth=args.min_depth,
+        subsample=args.subsample_trees
+    )
+    
     print(f'sampled {len(df)} problems')
 
     df.to_pickle(args.problem_save)

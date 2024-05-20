@@ -6,6 +6,7 @@ tqdm.pandas()
 from mwp.problems.base import Constant, Operation
 from mwp.problems.problems import PROBLEMS
 from mwp.trees import grammar_to_trees, ValuesSampler
+from mwp.trees.utils import random_sample
 
 
 class ProblemBuilder:
@@ -56,11 +57,16 @@ class ProblemBuilder:
 
         return problem_text, target_question
 
-    def build_dataset(self, max_depth, n_samples, min_depth=0) -> pd.DataFrame:
+    def build_dataset(self, max_depth, n_samples, min_depth=0, subsample=None) -> pd.DataFrame:
         print('generating trees')
         exprs, trees = self.get_trees(max_depth, min_depth=min_depth)
         
         print('num trees:', len(trees))
+
+        if subsample is not None:
+            exprs, trees = random_sample(subsample, exprs, trees)
+
+            print('num subsampled trees:', len(trees))
 
         # num_trees sized list[tuple(tree_vals, tree_strs, target_vals)]
         tree_samples = self.get_tree_values(trees, n_samples)

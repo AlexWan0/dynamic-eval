@@ -1,3 +1,6 @@
+import random
+
+
 class MemDict(dict):
     def reset(self):
         self.clear()
@@ -19,3 +22,10 @@ def add_mem(f):
         return result
 
     return wrapper
+
+def random_sample(n: int, *args: list) -> tuple[list]:
+    size = len(args[0])
+    assert all(len(arg) == size for arg in args)
+
+    indices = random.sample(range(size), n)
+    return tuple([arg[i] for i in indices] for arg in args)
