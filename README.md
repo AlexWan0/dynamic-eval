@@ -17,9 +17,10 @@ into the problem:
 Using this structured representation, I then search through the space of problems using Thompson sampling. The latter was inspired by ([Sclar et al., 2023](https://arxiv.org/pdf/2310.11324)).
 
 # Experiments
+I search with a budget of 2500 queries (to `Claude v1.2 Instant`) over a space of arithmetic reasoning problems that have similar levels of complexity. 
 
 ## Analysis of hard problems
-I search with a budget of 2500 queries (to `Claude v1.2 Instant`) over a space of problems that have similar levels of complexity. The worst performing problem has an accuracy of 67.5\% over 80 queries, and has the structure:
+The worst performing problem has an accuracy of 67.5\% over 80 queries, and has the structure:
 
 <p align="center">
     <img src="./assets/hard_tree.png" alt="Difficult arithmetic expression as a tree" width=75%>
@@ -27,10 +28,40 @@ I search with a budget of 2500 queries (to `Claude v1.2 Instant`) over a space o
 
 Each query involves sampling random integers for `x_1, ..., x_12` such that all intermediate values are between 2 and 100, and sampling random values for names, items, jobs, etc. that are used in the story.
 
-The (relatively) poor performance on this problem type probably isn't <i>just</i> due to its complexity as one of the best performing problems gets 100% accuracy over 40 queries, with the structure:
+The (relatively) poor performance on this problem type isn't <i>just</i> due to its complexity as one of the best performing problems gets 100% accuracy over 40 queries, with the structure:
 
 <p align="center">
     <img src="./assets/easy_tree.png" alt="Easy arithmetic expression as a tree" width=75% style="padding-top: 20px">
 </p>
 
-## Aggregate statistics
+
+
+# API
+See `experiemnts/find_spread.py` for an example of usage. To generate problems, run:
+
+```python
+problem = ProblemBuilder("jobs")
+df = problem.build_dataset(
+    max_depth,
+    num_samples_per_problem,
+    min_depth=min_depth,
+    subsample=num_subsample
+)
+```
+
+where `jobs` is a problem specified in `mwp/problems/problem_values.py`.
+
+To search for the best/worst problems, run:
+
+```python
+ps = ProblemSpace(df, replace=True)
+opt = ThompsonOpt(ps, reward_func, beta_prior=(1, 1))
+ranked_arms, arm_vals = opt.optimize(
+    budget=budget,
+    samples_per_pull=samples_per_pull,
+    maximize=maximize,
+    verbose=True
+)
+```
+
+where `reward_func` is a black-box function that returns the accuracy given a batch of samples, and `samples_per_pull` specifies size of the batch (See [Sclar et al., 2023](https://arxiv.org/pdf/2310.11324) for more detail).
