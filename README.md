@@ -34,7 +34,7 @@ The (relatively) poor performance on this problem type isn't <i>just</i> due to 
     <img src="./assets/easy_tree.png" alt="Easy arithmetic expression as a tree" width=75% style="padding-top: 20px">
 </p>
 
-
+The intermediate chain of thought reasoning allow us to analyze the failure-mode of this type of problem. Most of the the time, the error comes from the model "forgetting" to add the result from the subtree with leaf nodes `x_5, x_6, x_7`. My guess is that this is due to there being two consecutive additions in the problem, which tends to be unusual in e.g., the original GSM8k dataset.
 
 # API
 See `experiemnts/find_spread.py` for an example of usage. To generate problems, run:
